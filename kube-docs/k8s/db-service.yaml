@@ -1,0 +1,13 @@
+# Service for Internal Database Communication
+apiVersion: v1
+kind: Service
+metadata:
+  name: horilla-db-service
+  namespace: horilla
+spec:
+  selector:
+    app: horilla-db
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432

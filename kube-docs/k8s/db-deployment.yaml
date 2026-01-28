@@ -32,16 +32,4 @@ spec:
       - name: postgres-storage
         persistentVolumeClaim:
           claimName: postgres-pvc
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: horilla-db-service
-  namespace: horilla
-spec:
-  selector:
-    app: horilla-db
-  ports:
-    - protocol: TCP
-      port: 5432
-      targetPort: 5432
+          claimName: postgres-pvc

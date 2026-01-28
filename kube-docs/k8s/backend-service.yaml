@@ -1,0 +1,13 @@
+# Service for Internal Backend Communication
+apiVersion: v1
+kind: Service
+metadata:
+  name: horilla-backend-service
+  namespace: horilla
+spec:
+  selector:
+    app: horilla-backend
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000

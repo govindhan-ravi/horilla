@@ -4,7 +4,7 @@ metadata:
   name: horilla-frontend
   namespace: horilla
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: horilla-frontend
@@ -25,18 +25,4 @@ spec:
       - name: media-storage
         persistentVolumeClaim:
           claimName: media-pvc
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: horilla-frontend-service
-  namespace: horilla
-spec:
-  type: NodePort
-  selector:
-    app: horilla-frontend
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 80
-      nodePort: 30080
+          claimName: media-pvc
