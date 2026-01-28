@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: backend
-        image: <dockerhub-username>/horilla-backend:latest # Build and push this to Docker Hub
+        image: govindhan1234/horilla-backend:latest # Pulling from Docker Hub
         envFrom:
         - configMapRef:
             name: horilla-config
@@ -27,5 +27,4 @@ spec:
       volumes:
       - name: media-storage
         persistentVolumeClaim:
-          claimName: media-pvc
           claimName: media-pvc

@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: nginx
-        image: <dockerhub-username>/horilla-frontend:latest # Build and push this to Docker Hub
+        image: govindhan1234/horilla-frontend:latest # Pulling from Docker Hub
         ports:
         - containerPort: 80
         volumeMounts:
@@ -24,5 +24,4 @@ spec:
       volumes:
       - name: media-storage
         persistentVolumeClaim:
-          claimName: media-pvc
           claimName: media-pvc
