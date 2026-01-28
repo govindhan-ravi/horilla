@@ -20,5 +20,5 @@ RUN chmod +x /app/entrypoint.sh
 
 EXPOSE 8000
 
-# Use gunicorn for production
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "horilla.wsgi:application"]
+# Use entrypoint.sh to run migrations and start gunicorn
+ENTRYPOINT ["/bin/bash", "/app/entrypoint.sh"]
