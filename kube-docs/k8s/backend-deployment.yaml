@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: horilla-backend
+  namespace: horilla
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: horilla-backend
+  template:
+    metadata:
+      labels:
+        app: horilla-backend
+    spec:
+      containers:
+      - name: backend
+        image: horilla-backend:latest # Build this using Dockerfile.backend
+        envFrom:
+        - configMapRef:
+            name: horilla-config
+        ports:
+        - containerPort: 8000
+        volumeMounts:
+        - name: media-storage
+          mountPath: /app/media
+      volumes:
+      - name: media-storage
+        persistentVolumeClaim:
+          claimName: media-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: horilla-backend-service
+  namespace: horilla
+spec:
+  selector:
+    app: horilla-backend
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000

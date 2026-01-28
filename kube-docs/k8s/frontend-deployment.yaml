@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: horilla-frontend
+  namespace: horilla
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: horilla-frontend
+  template:
+    metadata:
+      labels:
+        app: horilla-frontend
+    spec:
+      containers:
+      - name: nginx
+        image: horilla-frontend:latest # Build this using Dockerfile.frontend
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: media-storage
+          mountPath: /usr/share/nginx/html/media
+      volumes:
+      - name: media-storage
+        persistentVolumeClaim:
+          claimName: media-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: horilla-frontend-service
+  namespace: horilla
+spec:
+  type: NodePort
+  selector:
+    app: horilla-frontend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+      nodePort: 30080
