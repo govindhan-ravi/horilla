@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: backend
-        image: horilla-backend:latest # Build this using Dockerfile.backend
+        image: <dockerhub-username>/horilla-backend:latest # Build and push this to Docker Hub
         envFrom:
         - configMapRef:
             name: horilla-config

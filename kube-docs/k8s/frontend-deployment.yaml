@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: nginx
-        image: horilla-frontend:latest # Build this using Dockerfile.frontend
+        image: <dockerhub-username>/horilla-frontend:latest # Build and push this to Docker Hub
         ports:
         - containerPort: 80
         volumeMounts:

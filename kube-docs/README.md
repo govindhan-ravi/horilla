@@ -32,23 +32,61 @@ horilla/
 
 ---
 
-## 🛠️ Step 1: Build Docker Images
+## 🚦 Step 0: Verify Cluster Status
 
-Before deploying to Kubernetes, you need to build and push your images to a registry (or load them into your cluster nodes).
+Before you begin, make sure your Kubernetes cluster is up and running.
 
-### Build Backend
 ```bash
-docker build -t horilla-backend:latest -f Dockerfile.backend .
+kubectl get nodes
 ```
+You should see your nodes listed with a status of `Ready`.
 
-### Build Frontend
+---
+
+## 📥 Step 1: Clone the Repository
+
+You need to have the source code and Kubernetes configuration files on your machine (or the CI/CD environment).
+
 ```bash
-docker build -t horilla-frontend:latest -f Dockerfile.frontend .
+git clone https://github.com/govindhan-ravi/horilla.git
+cd horilla
+git checkout 1.0
 ```
 
 ---
 
-## 🚀 Step 2: Deploy to Kubernetes
+## 🛠️ Step 2: Build and Push Docker Images
+
+Before deploying to Kubernetes, you need to build your images and push them to **Docker Hub**.
+
+### 1. Login to Docker Hub
+```bash
+docker login
+```
+
+### 2. Build and Tag Backend
+Replace `<your-username>` with your actual Docker Hub username.
+```bash
+docker build -t <your-username>/horilla-backend:latest -f Dockerfile.backend .
+```
+
+### 3. Build and Tag Frontend
+```bash
+docker build -t <your-username>/horilla-frontend:latest -f Dockerfile.frontend .
+```
+
+### 4. Push Images to Docker Hub
+```bash
+docker push <your-username>/horilla-backend:latest
+docker push <your-username>/horilla-frontend:latest
+```
+
+> [!IMPORTANT]
+> Make sure you have replaced `<dockerhub-username>` in `kube-docs/k8s/backend-deployment.yaml` and `kube-docs/k8s/frontend-deployment.yaml` with your actual username before proceeding to Step 3.
+
+---
+
+## 🚀 Step 3: Deploy to Kubernetes
 
 Run the following commands in order:
 
@@ -83,7 +121,7 @@ kubectl apply -f kube-docs/k8s/frontend-service.yaml
 
 ---
 
-## 🔍 Step 3: Verify the Deployment
+## 🔍 Step 4: Verify the Deployment
 
 Check if everything is running correctly:
 
