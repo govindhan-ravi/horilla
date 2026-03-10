@@ -1,0 +1,13 @@
+resource "local_file" "dockerfile_frontend" {
+  filename = "${path.module}/Dockerfile.frontend"
+  content  = <<-EOT
+FROM nginx:alpine
+
+# Copy static files to nginx html folder
+COPY static /usr/share/nginx/html/static
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
+EOT
+}

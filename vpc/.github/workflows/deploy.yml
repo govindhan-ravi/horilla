@@ -1,0 +1,58 @@
+name: Horilla CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - 1.0
+      - master
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+
+    - name: Login to Docker
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Build, tag, and push backend image to Docker
+      uses: docker/build-push-action@v4
+      with:
+        context: .
+        file: Dockerfile.backend
+        push: true
+        tags: ${{ steps.login-ecr.outputs.registry }}/horilla-backend:${{ github.sha }}
+
+    - name: Build, tag, and push frontend image to Docker
+      uses: docker/build-push-action@v4
+      with:
+        context: .
+        file: Dockerfile.frontend
+        push: true
+        tags: ${{ steps.login-ecr.outputs.registry }}/horilla-frontend:${{ github.sha }}
+
+    - name: Update kube config
+      run: aws eks update-kubeconfig --name sap-dev-terraform-eks-cluster --region us-east-1
+
+    - name: Deploy to EKS
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        sed -i.bak "s|IMAGE_PLACEHOLDER_BACKEND|$ECR_REGISTRY/horilla-backend:$IMAGE_TAG|g" k8s-manifest.yaml
+        sed -i.bak "s|IMAGE_PLACEHOLDER_FRONTEND|$ECR_REGISTRY/horilla-frontend:$IMAGE_TAG|g" k8s-manifest.yaml
+        kubectl apply -f k8s-manifest.yaml
