@@ -1,0 +1,15 @@
+# Service for External Frontend Access (NodePort)
+apiVersion: v1
+kind: Service
+metadata:
+  name: horilla-frontend-service
+  namespace: horilla
+spec:
+  type: NodePort
+  selector:
+    app: horilla-frontend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+      nodePort: 30080

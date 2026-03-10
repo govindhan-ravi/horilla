@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: horilla-frontend
+  namespace: horilla
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: horilla-frontend
+  template:
+    metadata:
+      labels:
+        app: horilla-frontend
+    spec:
+      containers:
+      - name: nginx
+        image: govindhan1234/horilla-frontend:latest # Pulling from Docker Hub
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: media-storage
+          mountPath: /usr/share/nginx/html/media
+      volumes:
+      - name: media-storage
+        persistentVolumeClaim:
+          claimName: media-pvc

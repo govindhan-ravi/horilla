@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: horilla-config
+  namespace: horilla
+data:
+  DATABASE_URL: "postgres://postgres:postgres@horilla-db-service:5432/horilla"
+  DJANGO_SETTINGS_MODULE: "horilla.settings"
+  # Add other environment variables here
