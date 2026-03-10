@@ -57,7 +57,6 @@ jobs:
         sed -i "s|govindhan1234/horilla-backend:latest|$ECR_REGISTRY/horilla-backend:$IMAGE_TAG|g" horilla/kube-docs/k8s/backend-deployment.yaml
         sed -i "s|govindhan1234/horilla-frontend:latest|$ECR_REGISTRY/horilla-frontend:$IMAGE_TAG|g" horilla/kube-docs/k8s/frontend-deployment.yaml
         
-        # Apply all official manifests (namespace, config, db, apps)
         # Apply namespace first, then everything else
         kubectl apply -f horilla/kube-docs/k8s/namespace.yaml
         kubectl apply -f horilla/kube-docs/k8s/

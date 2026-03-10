@@ -11,6 +11,12 @@ module "eks" {
 
   cluster_endpoint_public_access = true
 
+  cluster_addons = {
+    aws-ebs-csi-driver = {
+      service_account_role_arn = module.ebs_csi_irsa_role.iam_role_arn
+    }
+  }
+
   eks_managed_node_groups = {
     default = {
       instance_types = [var.node_instance_type]
