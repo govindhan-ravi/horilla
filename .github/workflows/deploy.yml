@@ -29,19 +29,19 @@ jobs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
 
-    - name: Build, tag, and push backend image to Docker
+    - name: Build and push backend image to Docker
       uses: docker/build-push-action@v4
       with:
-        context: .
-        file: Dockerfile.backend
+        context: ./horilla
+        file: ./horilla/Dockerfile.backend
         push: true
         tags: ${{ steps.login-ecr.outputs.registry }}/horilla-backend:${{ github.sha }}
 
-    - name: Build, tag, and push frontend image to Docker
+    - name: Build and push frontend image to Docker
       uses: docker/build-push-action@v4
       with:
-        context: .
-        file: Dockerfile.frontend
+        context: ./horilla
+        file: ./horilla/Dockerfile.frontend
         push: true
         tags: ${{ steps.login-ecr.outputs.registry }}/horilla-frontend:${{ github.sha }}
 
@@ -53,6 +53,9 @@ jobs:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         IMAGE_TAG: ${{ github.sha }}
       run: |
-        sed -i.bak "s|IMAGE_PLACEHOLDER_BACKEND|$ECR_REGISTRY/horilla-backend:$IMAGE_TAG|g" k8s-manifest.yaml
-        sed -i.bak "s|IMAGE_PLACEHOLDER_FRONTEND|$ECR_REGISTRY/horilla-frontend:$IMAGE_TAG|g" k8s-manifest.yaml
-        kubectl apply -f k8s-manifest.yaml
+        # Replace placeholders in official project manifests
+        sed -i "s|govindhan1234/horilla-backend:latest|$ECR_REGISTRY/horilla-backend:$IMAGE_TAG|g" horilla/kube-docs/k8s/backend-deployment.yaml
+        sed -i "s|govindhan1234/horilla-frontend:latest|$ECR_REGISTRY/horilla-frontend:$IMAGE_TAG|g" horilla/kube-docs/k8s/frontend-deployment.yaml
+        
+        # Apply all official manifests (namespace, config, db, apps)
+        kubectl apply -f horilla/kube-docs/k8s/
