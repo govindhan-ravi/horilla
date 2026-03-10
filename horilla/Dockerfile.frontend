@@ -1,3 +1,4 @@
+# Force build for Nginx fix
 FROM nginx:alpine
 
 # Copy static files to nginx html folder
