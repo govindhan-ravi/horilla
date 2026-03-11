@@ -34,5 +34,9 @@ data "kubernetes_service" "frontend" {
 
 output "horilla_login_url" {
   description = "Horilla Login Page URL"
-  value       = "http://${data.kubernetes_service.frontend.status[0].load_balancer[0].ingress[0].hostname}"
+  # Use try() to handle cases where the LoadBalancer isn't fully ready yet
+  value = try(
+    "http://${data.kubernetes_service.frontend.status[0].load_balancer[0].ingress[0].hostname}/login/",
+    "Deployment in progress... LoadBalancer is warming up. Please wait 2 minutes and run 'terraform apply' again to see the link."
+  )
 }
