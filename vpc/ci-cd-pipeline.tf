@@ -1,6 +1,7 @@
 resource "local_file" "ci_cd_pipeline" {
   filename = "${path.module}/../.github/workflows/deploy.yml"
   content  = <<-EOT
+# Build Timestamp: ${timestamp()}
 name: Horilla CI/CD Pipeline
 
 on:
@@ -9,6 +10,7 @@ on:
       - main
       - 1.0
       - master
+  workflow_dispatch: # This allows you to start the pipeline manually from GitHub UI
 
 jobs:
   build-and-push:
@@ -21,6 +23,28 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
 
+    - name: Login to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: $${{ secrets.DOCKERHUB_USERNAME }}
+        password: $${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Build and push backend image to Docker Hub
+      uses: docker/build-push-action@v4
+      with:
+        context: ./horilla
+        file: ./horilla/Dockerfile.backend
+        push: true
+        tags: govindhan1234/horilla-backend:$${{ github.sha }},govindhan1234/horilla-backend:latest
+
+    - name: Build and push frontend image to Docker Hub
+      uses: docker/build-push-action@v4
+      with:
+        context: ./horilla
+        file: ./horilla/Dockerfile.frontend
+        push: true
+        tags: govindhan1234/horilla-frontend:$${{ github.sha }},govindhan1234/horilla-frontend:latest
+
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v2
       with:
@@ -28,37 +52,16 @@ jobs:
         aws-secret-access-key: $${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${var.aws_region}
 
-    - name: Login to Docker
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
-
-    - name: Build and push backend image to Docker
-      uses: docker/build-push-action@v4
-      with:
-        context: ./horilla
-        file: ./horilla/Dockerfile.backend
-        push: true
-        tags: $${{ steps.login-ecr.outputs.registry }}/horilla-backend:$${{ github.sha }}
-
-    - name: Build and push frontend image to Docker
-      uses: docker/build-push-action@v4
-      with:
-        context: ./horilla
-        file: ./horilla/Dockerfile.frontend
-        push: true
-        tags: $${{ steps.login-ecr.outputs.registry }}/horilla-frontend:$${{ github.sha }}
-
     - name: Update kube config
       run: aws eks update-kubeconfig --name ${local.name}-${var.cluster_name} --region ${var.aws_region}
 
     - name: Deploy to EKS
       env:
-        ECR_REGISTRY: $${{ steps.login-ecr.outputs.registry }}
         IMAGE_TAG: $${{ github.sha }}
       run: |
-        # Replace placeholders in official project manifests
-        sed -i "s|govindhan1234/horilla-backend:latest|$ECR_REGISTRY/horilla-backend:$IMAGE_TAG|g" horilla/kube-docs/k8s/backend-deployment.yaml
-        sed -i "s|govindhan1234/horilla-frontend:latest|$ECR_REGISTRY/horilla-frontend:$IMAGE_TAG|g" horilla/kube-docs/k8s/frontend-deployment.yaml
+        # Update official manifests with a robust regex to ensure the new tag is applied
+        sed -i "s|image:.*|image: govindhan1234/horilla-backend:$IMAGE_TAG|g" horilla/kube-docs/k8s/backend-deployment.yaml
+        sed -i "s|image:.*|image: govindhan1234/horilla-frontend:$IMAGE_TAG|g" horilla/kube-docs/k8s/frontend-deployment.yaml
         
         # Apply namespace first, then everything else
         kubectl apply -f horilla/kube-docs/k8s/namespace.yaml
