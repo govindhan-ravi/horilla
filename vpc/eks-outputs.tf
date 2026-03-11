@@ -21,6 +21,7 @@ output "cluster_security_group_id" {
 # App Access Output
 # ---------------------------------------------
 
+/*
 # We fetch the service details to get the LoadBalancer URL
 data "kubernetes_service" "frontend" {
   metadata {
@@ -37,3 +38,4 @@ output "horilla_login_url" {
     "Deployment in progress... check again in 2 minutes."
   )
 }
+*/

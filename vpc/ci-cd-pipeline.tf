@@ -1,7 +1,7 @@
 resource "local_file" "ci_cd_pipeline" {
   filename = "${path.module}/../.github/workflows/deploy.yml"
   content  = <<-EOT
-# Build Timestamp: ${timestamp()}
+# Build Timestamp: ${timestamp()} [FINAL VERIFICATION]
 name: Horilla CI/CD Pipeline
 
 on:
