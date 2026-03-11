@@ -20,8 +20,19 @@ output "cluster_security_group_id" {
 # ---------------------------------------------
 # App Access Output
 # ---------------------------------------------
+# This data source waits for the display_final_output script to finish
+# (which itself waits for GitHub Actions to deploy the app).
+# By the time this runs, the LoadBalancer will exist.
 
-output "horilla_login_status" {
-  description = "Application Status"
-  value       = "Deployment is running in the background. Check the 'display_final_output' script logs above for the live URL!"
+data "kubernetes_service" "frontend" {
+  depends_on = [null_resource.display_final_output]
+  metadata {
+    name      = "horilla-frontend-service"
+    namespace = "horilla"
+  }
+}
+
+output "horilla_login_url" {
+  description = "Horilla Login Page URL"
+  value       = "http://${data.kubernetes_service.frontend.status[0].load_balancer[0].ingress[0].hostname}"
 }
