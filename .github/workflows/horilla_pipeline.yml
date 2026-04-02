@@ -172,5 +172,3 @@ jobs:
         docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-frontend:${{ github.sha }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-frontend:latest
         docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-frontend:${{ github.sha }}
         docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-frontend:latest
-
-    # 15. Deployment/Publishing Success (handled above)
