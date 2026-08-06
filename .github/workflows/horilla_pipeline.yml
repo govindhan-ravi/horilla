@@ -31,7 +31,7 @@ jobs:
           --health-retries 5
 
     steps:
-    # 1. Workflow Trigger (defined above)
+    # 1. Workflow (defined above)
     
     # 2. Code Checkout
     - name: Checkout repository
